@@ -1089,7 +1089,7 @@ public class SyntaxAnalyser {
             if (More_At_Fn())
                 return true;
         }
-        else if(TokenSet.get(TokenNumber).getClassPart().matches("MD|PM|RELATIONAL_OP|ASGN_OP|&&|,|]|;") ||
+        else if(TokenSet.get(TokenNumber).getClassPart().matches("MD|PM|RELATIONAL_OP|ASGN_OP|&&|,|]|;|PPMM") ||
                 TokenSet.get(TokenNumber).getClassPart().equals(")")||
                 TokenSet.get(TokenNumber).getClassPart().equals("||")){
             TokenNumber++;
