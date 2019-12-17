@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cee2adbe-ef23-4090-b75e-3131b20115ab" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/LexicalAnalyser.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/LexicalAnalyser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/SyntaxAnalyser.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/SyntaxAnalyser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/RandoS/LexicalAnalyser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/RandoS/LexicalAnalyser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/RandoS/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/RandoS/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/RandoS/SyntaxAnalyser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/RandoS/SyntaxAnalyser.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -70,6 +73,14 @@
       <option name="presentableId" value="Default" />
       <updated>1573380363928</updated>
     </task>
+    <task id="LOCAL-00001" summary="Fixed Some Bugs">
+      <created>1574084366912</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1574084366912</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -85,18 +96,17 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed Some Bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Some Bugs" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/RandoS/SyntaxAnalyser.java</url>
           <line>35</line>
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/RandoS/SyntaxAnalyser.java</url>
-          <line>575</line>
-          <option name="timeStamp" value="44" />
+          <option name="timeStamp" value="50" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -105,7 +105,14 @@ class LexicalAnalyser {
                                 !Token_list.get(Token_list.size() - 1).getClassPart().equals(CONSTANT_FLOAT)) {
                             addNumber();
                         }
-
+                    }
+                    else if (shouldCheckNextWord() && mCharacter == '&' && sourceCode.charAt(charNumber + 1) == '&') {
+                        mTemporary = "&&";
+                        charNumber++;
+                    }
+                    else if (shouldCheckNextWord() && mCharacter == '|' && sourceCode.charAt(charNumber + 1) == '|') {
+                        mTemporary = "&&";
+                        charNumber++;
                     }
                     // For Comments
                     else if (mCharacter == '/') {
@@ -431,6 +438,8 @@ class LexicalAnalyser {
             case '*':
             case '/':
             case '!':
+            case '&':
+            case '|':
                 return true;
             default:
                 return false;

@@ -10,14 +10,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        String sourceCode = readFileAsString("C:\\Users\\s\\Desktop\\test.txt")+"$";
-        Tokens = new ArrayList<>();
+         String sourceCode = readFileAsString("C:\\Users\\s\\Desktop\\test.txt")+"$";
+         Tokens = new ArrayList<>();
 
-        LexicalAnalyser lexicalAnalyser = new LexicalAnalyser(sourceCode);
-        Tokens = lexicalAnalyser.getToken_list();
-        lexicalAnalyser.displayTokens();
+         LexicalAnalyser lexicalAnalyser = new LexicalAnalyser(sourceCode);
+         Tokens = lexicalAnalyser.getToken_list();
+         lexicalAnalyser.displayTokens();
 
-        SyntaxAnalyser syntaxAnalyser = new SyntaxAnalyser(Tokens);
+         SyntaxAnalyser syntaxAnalyser = new SyntaxAnalyser(Tokens);
+
     }
 
     private static String readFileAsString(String fileName)throws Exception{

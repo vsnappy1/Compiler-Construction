@@ -174,11 +174,11 @@ public class SyntaxAnalyser {
                     }
                 }
             }
-        } else if (TokenSet.get(TokenNumber).getClassPart().equals("MAIN")) {
-            return true;
-        } else if (TokenSet.get(TokenNumber).getClassPart().equals("}")) {
-            return true;
         }
+        else if (TokenSet.get(TokenNumber).getClassPart().equals("MAIN"))
+            return true;
+        else if (TokenSet.get(TokenNumber).getClassPart().equals("}"))
+            return true;
 
         return false;
     }
@@ -220,7 +220,7 @@ public class SyntaxAnalyser {
     }
 
     private boolean PLD() {
-        if (TokenSet.get(TokenNumber).getClassPart().matches(",|ASGN_OP|") ||
+        if (TokenSet.get(TokenNumber).getClassPart().matches(",|ASGN_OP|;") ||
                 TokenSet.get(TokenNumber).getClassPart().equals("(")) {
 
             if (TokenSet.get(TokenNumber).getClassPart().equals("(")) {
@@ -560,7 +560,6 @@ public class SyntaxAnalyser {
     }
 
     private boolean SAFOID() {
-
 
         if(TokenSet.get(TokenNumber).getClassPart().equals("[")){
             TokenNumber++;
