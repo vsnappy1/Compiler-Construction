@@ -17,7 +17,9 @@ public class Main {
          Tokens = lexicalAnalyser.getToken_list();
          lexicalAnalyser.displayTokens();
 
-         SyntaxAnalyser syntaxAnalyser = new SyntaxAnalyser(Tokens);
+         SemanticAnalyser syntaxAnalyser = new SemanticAnalyser(Tokens);
+
+
 
     }
 
@@ -27,3 +29,4 @@ public class Main {
         return data;
     }
 }
+
