@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cee2adbe-ef23-4090-b75e-3131b20115ab" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Compiler Construction/com/RandoS/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/RandoS/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/RandoS/Main.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -83,7 +81,14 @@
       <option name="project" value="LOCAL" />
       <updated>1576615777895</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Semantic Function Setup, 90% implementation done">
+      <created>1576959428346</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1576959428346</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -102,7 +107,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fixed Some Bugs" />
     <MESSAGE value="Semantic Function Setup, but need implementation in CFG" />
-    <option name="LAST_COMMIT_MESSAGE" value="Semantic Function Setup, but need implementation in CFG" />
+    <MESSAGE value="Semantic Function Setup, 90% implementation done" />
+    <option name="LAST_COMMIT_MESSAGE" value="Semantic Function Setup, 90% implementation done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -117,24 +123,6 @@
           <line>100</line>
           <option name="timeStamp" value="101" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/RandoS/SemanticAnalyser.java</url>
-          <line>82</line>
-          <option name="timeStamp" value="104" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/com/RandoS/SemanticAnalyser.java</url>
-          <line>1081</line>
-          <option name="timeStamp" value="108" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/com/RandoS/SemanticAnalyser.java</url>
-          <line>1188</line>
-          <properties class="com.RandoS.SemanticAnalyser" method="Parameter_List">
-            <option name="EMULATED" value="true" />
-          </properties>
-          <option name="timeStamp" value="102" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
@@ -144,6 +132,9 @@
         <watch expression="TokenSet.get(TokenNumber).getLineNumber()" language="JAVA" />
         <watch expression="TokenSet.get(TokenNumber).getValuePart()" language="JAVA" />
         <watch expression="scopeStack" language="JAVA" />
+        <watch expression="definitionTable" language="JAVA" />
+        <watch expression="functionDefinitionTable" language="JAVA" />
+        <watch expression="Type" language="JAVA" />
         <watch expression="definitionTable" language="JAVA" />
       </configuration>
     </watches-manager>
