@@ -88,7 +88,14 @@
       <option name="project" value="LOCAL" />
       <updated>1576959428346</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Semantic Done">
+      <created>1577112213510</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1577112213510</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -108,7 +115,8 @@
     <MESSAGE value="Fixed Some Bugs" />
     <MESSAGE value="Semantic Function Setup, but need implementation in CFG" />
     <MESSAGE value="Semantic Function Setup, 90% implementation done" />
-    <option name="LAST_COMMIT_MESSAGE" value="Semantic Function Setup, 90% implementation done" />
+    <MESSAGE value="Semantic Done" />
+    <option name="LAST_COMMIT_MESSAGE" value="Semantic Done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
