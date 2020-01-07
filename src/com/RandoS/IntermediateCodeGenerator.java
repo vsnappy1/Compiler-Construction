@@ -7,7 +7,7 @@ import static com.RandoS.LexicalAnalyser.*;
 
 // Semantic Analyser works with syntax analyser
 
-public class SemanticAnalyser {
+public class IntermediateCodeGenerator {
 
     private static int TokenNumber;
     private ArrayList<Token> TokenSet;
@@ -20,7 +20,7 @@ public class SemanticAnalyser {
     private int currentScope;
     private int scope;
     private Stack<Integer> scopeStack;
-    private Stack<String> typeStack;
+    private Stack<NameType> typeStack;
     private Stack<String> operatorStack;
     private String ClassName;
     private String functionName;
@@ -34,11 +34,24 @@ public class SemanticAnalyser {
     private String TypeModifier;
     private Boolean Constant;
 
-    public SemanticAnalyser(ArrayList<Token> TokenSet) {
+    private int indexT;
+    private int indexL;
+    private String intermediateCode;
+    private ArrayList<String> temp;
+    private ArrayList<String> tempFunCall;
+    private String forLoop;
+
+
+    public IntermediateCodeGenerator(ArrayList<Token> TokenSet) {
 
         TokenNumber = 0;
         currentScope = 0;
         scope = 0;
+        indexT = 0;
+        indexL = 0;
+        intermediateCode = "";
+        temp = new ArrayList<>();
+        tempFunCall = new ArrayList<>();
         definitionTable = new ArrayList<>();
         classDefinitionTable = new ArrayList<>();
         functionDefinitionTable = new ArrayList<>();
@@ -87,6 +100,7 @@ public class SemanticAnalyser {
                                                             DestroyScope();
                                                             TokenNumber++;
                                                             if (Defs()) {
+                                                                displayIC();
                                                                 return true;
                                                             }
                                                         }
@@ -347,6 +361,7 @@ public class SemanticAnalyser {
     }
 
     private boolean DA() {
+
         if (scopeStack.size() != 1 || !insertIntoClassDefinitionTable(new ClassDefinition(Name, Type, AccessModifier, Constant, TypeModifier), ClassName)) {
             if (!insertIntoFunctionDefinitionTable(new FunctionDefinition(Name, Type, currentScope))) {
                 redeclarationError();
@@ -358,11 +373,16 @@ public class SemanticAnalyser {
             } else if (TokenSet.get(TokenNumber).getClassPart().equals("ASGN_OP")) {
                 FunctionDefinition tempFunctionDefinition = lookUpFunctionDefinitionTable(TokenSet.get(TokenNumber-1).getValuePart(),currentScope);
                 if (tempFunctionDefinition != null) {
-                    typeStack.push(tempFunctionDefinition.getType());
+                    typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
                 }
                 operatorStack.push(TokenSet.get(TokenNumber).getValuePart());
+                temp.clear();
+                temp.add(TokenSet.get(TokenNumber-1).getValuePart());
+                temp.add(TokenSet.get(TokenNumber).getValuePart());
                 TokenNumber++;
+                temp.add(TokenSet.get(TokenNumber).getValuePart());
                 if (SAO()) {
+                    addIC();
                     if (One_More_DA())
                         return true;
                 }
@@ -475,6 +495,7 @@ public class SemanticAnalyser {
         if (TokenSet.get(TokenNumber).getClassPart().matches("int|float|String|char|bool|ID|FOR|IF|BREAK|CONTINUE|RETURN|PPMM")) {
 
             if (TokenSet.get(TokenNumber).getClassPart().equals("ID")) {
+                temp.add(TokenSet.get(TokenNumber).getValuePart());
                 Type = TokenSet.get(TokenNumber).getValuePart();
                 TokenNumber++;
                 if (ADA()) {
@@ -562,7 +583,7 @@ public class SemanticAnalyser {
             TokenNumber++;
             if(AE())
                 checkCompatibility();
-                return true;
+            return true;
         }
         else if(TokenSet.get(TokenNumber).getClassPart().matches(",|]|;")||
                 TokenSet.get(TokenNumber).getClassPart().equals(")") ||
@@ -618,7 +639,7 @@ public class SemanticAnalyser {
             TokenNumber++;
             if (E())
                 checkCompatibility();
-                return true;
+            return true;
         }
         else if(TokenSet.get(TokenNumber).getClassPart().matches(",|]|;|&&|RELATIONAL_OP")||
                 TokenSet.get(TokenNumber).getClassPart().equals(")") ||
@@ -646,7 +667,7 @@ public class SemanticAnalyser {
                 checkCompatibility();
                 return true;
             }
-            }
+        }
         else if(TokenSet.get(TokenNumber).getClassPart().matches(",|]|;|&&|RELATIONAL_OP|PM")||
                 TokenSet.get(TokenNumber).getClassPart().equals(")") ||
                 TokenSet.get(TokenNumber).getClassPart().equals("||")){
@@ -666,8 +687,7 @@ public class SemanticAnalyser {
                 TokenSet.get(TokenNumber).getClassPart().equals(LexicalAnalyser.CONSTANT_FLOAT)||
                 TokenSet.get(TokenNumber).getClassPart().equals(CONSTANT_INTEGER)||
                 TokenSet.get(TokenNumber).getClassPart().equals(LexicalAnalyser.CONSTANT_BOOLEAN)){
-
-            typeStack.push(typeOfConstant(TokenSet.get(TokenNumber).getClassPart()));
+            typeStack.push(new NameType(TokenSet.get(TokenNumber).getValuePart(),typeOfConstant(TokenSet.get(TokenNumber).getClassPart())));
             TokenNumber++;
             return true;
         }
@@ -694,7 +714,7 @@ public class SemanticAnalyser {
         if(TokenSet.get(TokenNumber).getClassPart().equals("[")){
 
             if(tempFunctionDefinition != null){
-                typeStack.push(tempFunctionDefinition.getType());
+                typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
             }
             else {
                 variableNotFoundError();
@@ -718,7 +738,7 @@ public class SemanticAnalyser {
             if (Parameter_List()) {
                 if (TokenSet.get(TokenNumber).getClassPart().equals(")")) {
                     if (tempClassDefinition != null) {
-                        typeStack.push(doesParametersMatch(tempClassDefinition.getType(),Parameters));
+                        typeStack.push(new NameType(tempClassDefinition.getName(),doesParametersMatch(tempClassDefinition.getType(),Parameters)));
                     }
                     TokenNumber++;
                     return true;
@@ -727,7 +747,7 @@ public class SemanticAnalyser {
         }
         else if(TokenSet.get(TokenNumber).getClassPart().equals("PPMM")) {
             if(tempFunctionDefinition != null){
-                typeStack.push(tempFunctionDefinition.getType());
+                typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
             }
             else {
                 variableNotFoundError();
@@ -745,7 +765,7 @@ public class SemanticAnalyser {
                 TokenSet.get(TokenNumber).getClassPart().equals(")")) {
 
             if(tempFunctionDefinition != null){
-                typeStack.push(tempFunctionDefinition.getType());
+                typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
             }
             else {
                 variableNotFoundError();
@@ -867,16 +887,22 @@ public class SemanticAnalyser {
             if(TokenSet.get(TokenNumber).getClassPart().equals("(")){
                 TokenNumber++;
                 if(OE()){
-                    if(!typeStack.peek().equals("bool")){
+                    if(!typeStack.pop().getType().equals("bool")){
                         conditionShouldBeBooleanError();
                     }
                     if(TokenSet.get(TokenNumber).getClassPart().equals(")")){
+                        temp.add("if( t"+indexT +" == false) jmp "+createLabel());
+                        addIC();
                         TokenNumber++;
                         CreateScope();
-                        if(Body())
+                        if(Body()) {
                             DestroyScope();
-                            if(Else())
-                                return true;
+                        }
+                        if(Else()) {
+                            temp.add("L"+indexL+" : ");
+                            addIC();
+                            return true;
+                        }
                     }
                 }
             }
@@ -888,11 +914,17 @@ public class SemanticAnalyser {
 
     private boolean Else() {
         if(TokenSet.get(TokenNumber).getClassPart().equals("ELSE")){
+            temp.add("jmp "+createLabel());
+            addIC();
+            temp.add("L"+(indexL-1)+" : ");
+            addIC();
+
             TokenNumber++;
             CreateScope();
-            if(Body())
+            if(Body()) {
                 DestroyScope();
-                return true;
+            }
+            return true;
         }
         else if(TokenSet.get(TokenNumber).getClassPart().matches("int|float|String|char|bool|ID|FOR|IF|BREAK|CONTINUE|RETURN|}")){
             return true;
@@ -926,15 +958,25 @@ public class SemanticAnalyser {
                 CreateScope();
                 TokenNumber++;
                 if(C1()){
+                    temp.add("L"+(indexL+2)+ " : ");
+                    addIC();
                     if (C2()){
                         if(TokenSet.get(TokenNumber).getClassPart().equals(";")) {
                             TokenNumber++;
                             if(C3()){
                                 if(TokenSet.get(TokenNumber).getClassPart().equals(")")) {
+                                    temp.add("if( t"+indexT+" == false ) jmp "+createLabel() );
+                                    addIC();
                                     TokenNumber++;
                                     if(Body())
                                         DestroyScope();
-                                        return true;
+                                    temp.add(forLoop);
+                                    addIC();
+                                    temp.add("jmp L"+(indexL+1)+" : ");
+                                    addIC();
+                                    temp.add("L"+(indexL)+" : ");
+                                    addIC();
+                                    return true;
                                 }
                             }
                         }
@@ -959,9 +1001,10 @@ public class SemanticAnalyser {
 
     private boolean Asgn_IncDec() {
         if(TokenSet.get(TokenNumber).getClassPart().equals("ID")) {
-            FunctionDefinition temp = lookUpFunctionDefinitionTable(TokenSet.get(TokenNumber).getValuePart(),currentScope);
-            if(temp != null){
-                typeStack.push(temp.getType());
+            temp.add(TokenSet.get(TokenNumber).getValuePart());
+            FunctionDefinition tempFunctionDefinition = lookUpFunctionDefinitionTable(TokenSet.get(TokenNumber).getValuePart(),currentScope);
+            if(tempFunctionDefinition != null){
+                typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
             }
             TokenNumber++;
             if(Asgnn()){
@@ -970,6 +1013,7 @@ public class SemanticAnalyser {
             }
         }
         else if(TokenSet.get(TokenNumber).getClassPart().equals("PPMM")) {
+
             TokenNumber++;
             if(TokenSet.get(TokenNumber).getClassPart().equals("ID")) {
                 TokenNumber++;
@@ -982,6 +1026,8 @@ public class SemanticAnalyser {
 
     private boolean AID() {
         if(TokenSet.get(TokenNumber).getClassPart().equals("PPMM")) {
+            temp.add(TokenSet.get(TokenNumber).getValuePart());
+            forLoop = formString();
             TokenNumber++;
             return true;
         }
@@ -1002,7 +1048,7 @@ public class SemanticAnalyser {
 
         if(TokenSet.get(TokenNumber).getClassPart().matches("ID|PPMM|!|int_Constant|float_Constant|String_Constant|char_Constant|bool_Constant")) {
             if (OE()) {
-                if(!typeStack.peek().equals("bool")){
+                if(!typeStack.peek().getType().equals("bool")){
                     conditionShouldBeBooleanError();
                 }
                 return true;
@@ -1036,6 +1082,7 @@ public class SemanticAnalyser {
             if(Array()){
                 if(TokenSet.get(TokenNumber).getClassPart().equals("ID")) {
                     Name = TokenSet.get(TokenNumber).getValuePart();
+                    temp.add(TokenSet.get(TokenNumber).getValuePart());
                     TokenNumber++;
                     if (DA()) {
                         if (TokenSet.get(TokenNumber).getClassPart().equals(";")) {
@@ -1053,7 +1100,7 @@ public class SemanticAnalyser {
     private boolean ADA() {
         FunctionDefinition tempFunctionDefinition = lookUpFunctionDefinitionTable(TokenSet.get(TokenNumber-1).getValuePart(),currentScope);
         if(tempFunctionDefinition != null){
-            typeStack.push(tempFunctionDefinition.getType());
+            typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
         }
         if(TokenSet.get(TokenNumber).getClassPart().matches("ID|.|int|float|String|char|bool|PPMM|ASGN_OP")||
                 TokenSet.get(TokenNumber).getClassPart().equals("[")||
@@ -1082,6 +1129,8 @@ public class SemanticAnalyser {
                     variableNotFoundError();
                 }
                 if (PPAS()) {
+
+                    addIC();
                     if (TokenSet.get(TokenNumber).getClassPart().equals(";")) {
                         TokenNumber++;
                         return true;
@@ -1125,25 +1174,27 @@ public class SemanticAnalyser {
 
         if(TokenSet.get(TokenNumber).getClassPart().equals("ASGN_OP")) {
             operatorStack.push(TokenSet.get(TokenNumber).getValuePart());
+            temp.add(TokenSet.get(TokenNumber).getValuePart());
             TokenNumber++;
+            temp.add(TokenSet.get(TokenNumber).getValuePart());
             if(OE_AO_Init()){
                 checkCompatibility();
                 return true;
             }
         }
         else if(TokenSet.get(TokenNumber).getClassPart().equals("PPMM")) {
-            FunctionDefinition temp = lookUpFunctionDefinitionTable(TokenSet.get(TokenNumber-1).getValuePart(),currentScope);
-            if(temp != null){
-                typeStack.push(temp.getType());
+            FunctionDefinition tempFunctionDefinition = lookUpFunctionDefinitionTable(TokenSet.get(TokenNumber-1).getValuePart(),currentScope);
+            if(tempFunctionDefinition != null){
+                typeStack.push(new NameType(tempFunctionDefinition.getName(), tempFunctionDefinition.getType()));
                 operatorStack.push(TokenSet.get(TokenNumber).getValuePart());
-                String type = Compatibility(typeStack.pop(),operatorStack.pop());
+                String type = Compatibility(typeStack.pop().getType(),operatorStack.pop());
                 if(type == null){
                     missMatchError();
                 }
             }
-            else
-                variableNotFoundError();
-
+            else{
+                variableNotFoundError();}
+            temp.add(TokenSet.get(TokenNumber).getValuePart());
             TokenNumber++;
             return true;
         }
@@ -1173,12 +1224,12 @@ public class SemanticAnalyser {
             if(TokenSet.get(TokenNumber).getClassPart().equals("[")) {
                 TokenNumber++;
                 if(OE()){
-                    if(!typeStack.peek().equals("int")){
+                    if(!typeStack.peek().getType().equals("int")){
                         shouldBeIntegerError();
                     }
                     typeStack.pop();
                     if(TokenSet.get(TokenNumber).getClassPart().equals("]")) {
-                        typeStack.push(Type);
+                        typeStack.push(new NameType("",Type));
                         checkCompatibility();
                         TokenNumber++;
                         return true;
@@ -1189,9 +1240,9 @@ public class SemanticAnalyser {
         else if(TokenSet.get(TokenNumber).getClassPart().equals("ID")) {
             Definition temp = lookUpDefinitionTable(TokenSet.get(TokenNumber).getValuePart());
             if(temp != null){
-                typeStack.push(temp.getParent());
-                typeStack.push(temp.getName());
-                checkCompatibility(typeStack.pop(), typeStack.pop(), typeStack.pop());
+                typeStack.push(new NameType("",temp.getParent()));
+                typeStack.push(new NameType("",temp.getName()));
+                checkCompatibility(typeStack.pop().getType(), typeStack.pop().getType(), typeStack.pop().getType());
             }
             TokenNumber++;
 
@@ -1227,7 +1278,9 @@ public class SemanticAnalyser {
     private boolean Parameter_List() {
         if (TokenSet.get(TokenNumber).getClassPart().matches("int_Constant|float_Constant|String_Constant|char_Constant|bool_Constant|ID|PPMM|!")) {
             if (OE()) {
-                addInParameterList(typeStack.pop());
+
+
+                addInParameterList(typeStack.pop().getType());
                 if (MP()) {
                     return true;
                 }
@@ -1243,7 +1296,8 @@ public class SemanticAnalyser {
         if(TokenSet.get(TokenNumber).getClassPart().equals(",")) {
             TokenNumber++;
             if (OE()){
-                addInParameterList(typeStack.pop());
+
+                addInParameterList(typeStack.pop().getType());
                 if(MP())
                     return true;
             }
@@ -1261,7 +1315,7 @@ public class SemanticAnalyser {
             if (TokenSet.get(TokenNumber).getClassPart().equals("[")) {
                 TokenNumber++;
                 if (OE()) {
-                    if(!typeStack.peek().equals("int")){
+                    if(!typeStack.peek().getType().equals("int")){
                         shouldBeIntegerError();
                     }
                     if (TokenSet.get(TokenNumber).getClassPart().equals("]")) {
@@ -1298,13 +1352,13 @@ public class SemanticAnalyser {
                 tempDefination = lookUpDefinitionTable(tempFun.getType());
             }
             else {
-                tempDefination = lookUpDefinitionTable(typeStack.peek());
+                tempDefination = lookUpDefinitionTable(typeStack.peek().getType());
             }
             if(tempDefination != null){
                 ClassDefinition tempClassDefinition = lookUpClassDefinitionTable(TokenSet.get(TokenNumber).getValuePart(),tempDefination.getName());
                 if(tempClassDefinition != null){
                     if(tempClassDefinition.getAccessModifier().equals("public") && tempClassDefinition.getTypeModifier().equals("")){
-                        typeStack.push(tempClassDefinition.getType());
+                        typeStack.push(new NameType(tempClassDefinition.getName(),tempClassDefinition.getType()));
                     }
                 }
                 else
@@ -1574,9 +1628,9 @@ public class SemanticAnalyser {
         for( i = functionDefinitionTable.size() -1 ; i >= 0 ; i--)
         {
             if(functionDefinitionTable.get(i).getName().equals(Name)) { //LookUp current Scope
-            if(functionDefinitionTable.get(i).getScope() == Scope)
-                return functionDefinitionTable.get(i);
-            break;
+                if(functionDefinitionTable.get(i).getScope() == Scope)
+                    return functionDefinitionTable.get(i);
+                break;
             }
         }
         int hierarchySize = scopeStack.size();
@@ -1634,7 +1688,7 @@ public class SemanticAnalyser {
         }
 
         else if (Left.equals("char")) {
-             if (Operator.equals("==")) {
+            if (Operator.equals("==")) {
                 if (Right.equals("char") )
                     return "bool";
             }
@@ -1783,10 +1837,28 @@ public class SemanticAnalyser {
 
     private void checkCompatibility(){
         if(typeStack.size() > 1 && operatorStack.size() > 0) {
-            String tempType = Compatibility(typeStack.pop(), typeStack.pop(), operatorStack.pop());
+            if(!operatorStack.peek().equals("=")) {
+                String p1 = typeStack.get(typeStack.size() - 2).getName();
+                String p2 = typeStack.peek().getName();
+
+                if(p1.equals("")){
+                    if(p2.equals("")) {
+                        p1 = "t" + (indexT - 1);
+                    }
+                    else
+                        p1 = "t"+(indexT);
+                }
+                if(p2.equals("")){
+                    p2 = "t"+(indexT);
+                }
+
+                temp.add(createTemp() + " = " + p1+" " + operatorStack.peek()+" " + p2);
+                addIC();
+            }
+            String tempType = Compatibility(typeStack.pop().getType(), typeStack.pop().getType(), operatorStack.pop());
             if (tempType != null) {
                 if(!tempType.equals("")) {
-                    typeStack.push(tempType);
+                    typeStack.push(new NameType("",tempType));
                 }
             } else {
                 missMatchError();
@@ -1921,5 +1993,75 @@ public class SemanticAnalyser {
         public int getScope(){
             return mScope ;
         }
+    }
+
+
+    //******************************INTERMEDIATE CODE GENERATOR********************************************
+    private String createTemp(){
+        indexT++;
+        return "t"+indexT;
+    }
+
+    private String createLabel(){
+        indexL++;
+        return "L"+indexL;
+    }
+
+    private void addIC(){
+
+        if(temp.size() > 1) {
+            if (temp.get(1).matches("=|-=|/=|--") ||
+                    temp.get(1).equals("+=") ||
+                    temp.get(1).equals("*=") ||
+                    temp.get(1).equals("++")) {
+                intermediateCode += ICGFormat(temp.get(1)) + "\n";
+                temp.clear();
+            }
+        }
+        else if(temp.size()>0) {
+            intermediateCode += temp.get(0)+ "\n";
+            temp.clear();
+        }
+    }
+
+    private void displayIC(){
+        System.out.println(intermediateCode);
+    }
+
+    private String formString(){
+        String result = ICGFormat(temp.get(1));
+        temp.clear();
+        return result;
+    }
+
+    private String ICGFormat(String OP){
+
+        String result = "";
+
+        switch (OP) {
+            case "=":
+                result = temp.get(0) + " = " + temp.get(2);
+                break;
+            case "++":
+                result = temp.get(0) + " = " + temp.get(0) + " + " + "1";
+                break;
+            case "--":
+                result = temp.get(0) + " = " + temp.get(0) + " - " + "1";
+                break;
+            case "+=":
+                result = temp.get(0) + " = " + temp.get(0) + " + " + temp.get(2);
+                break;
+            case "-=":
+                result = temp.get(0) + " = " + temp.get(0) + " - " + temp.get(2);
+                break;
+            case "*=":
+                result = temp.get(0) + " = " + temp.get(0) + " * " + temp.get(2);
+                break;
+            case "/=":
+                result = temp.get(0) + " = " + temp.get(0) + " / " + temp.get(2);
+                break;
+        }
+
+        return result;
     }
 }

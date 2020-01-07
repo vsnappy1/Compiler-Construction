@@ -17,7 +17,8 @@ public class Main {
          Tokens = lexicalAnalyser.getToken_list();
          lexicalAnalyser.displayTokens();
 
-         SemanticAnalyser syntaxAnalyser = new SemanticAnalyser(Tokens);
+         //SemanticAnalyser semanticAnalyser = new SemanticAnalyser(Tokens);
+        IntermediateCodeGenerator ICG = new IntermediateCodeGenerator(Tokens);
 
 
 
